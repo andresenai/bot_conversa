@@ -20,7 +20,7 @@
     {
         $buscas = explode(" ",$texto);
 
-        $palavrasInuteis = ["tem", "tens", "o", "a", "aos", "ao", "um", "dos", "das", "as", "os", "de", "da", "do", "qual", "quais", "quantas", "quantos", "que", "como", "pois", "porque", "porquanto", "ou", "ora", "pois", "porque", "mas", "porém", "todavia", "contudo", "entretanto", "senão", "tão", "tanto", "tal", "é", "à", "e", "como", "com"];
+        $palavrasInuteis = ["tem", "tens", "o", "a", "aos", "ao", "um", "dos", "das", "as", "os", "de", "da", "do", "qual", "quais", "quantas", "quantos", "que", "como", "pois", "porque", "porquanto", "ou", "ora", "pois", "porque", "mas", "porém", "todavia", "contudo", "entretanto", "senão", "tão", "tanto", "tal", "é", "à", "e", "como", "com","na"];
 
         $palavrasUteis = [];
         foreach($buscas as $palavra)
@@ -51,8 +51,9 @@
     {
         try
         {
-            $doc = new DOMDocument();
-            $doc->loadHTML($html);
+            $doc = $html;
+            // $doc = new DOMDocument();
+            // $doc->loadHTML($html);
             return $doc;
         }
         catch(Exception $e)
@@ -64,7 +65,19 @@
     function carregarParagrafos($documento)
     {
         try {
-            return $documento->getElementsByTagName("p");
+            $paragrafos = explode("<p>",$documento);
+            $saida = [];
+
+            $posicao = 0;
+            foreach($paragrafos as $p)
+            {
+                if($posicao > 1)
+                {
+                    array_push($saida, strip_tags($p));
+                }
+                $posicao++;
+            }
+            return $saida;
         } catch (Exception $th) {
             throw new Exception("Erro ao capturar paragrafos",3);            
         }
@@ -85,7 +98,7 @@
     {
         foreach($paragrafos as $paragrafo)
         {
-            if(strpos($paragrafo->nodeValue,$palavra))
+            if(strpos($paragrafo,$palavra))
             {
                 return $paragrafo;
             }
@@ -145,15 +158,27 @@
                     $documento = carregarDocumento($pagina);
                     $paragrafos = carregarParagrafos($documento);
 
+
                     foreach($paragrafos as $paragrafo)
                     {
                         // encontra o primeiro paragrafo da primeira pagina
-                        $paragrafoSaida = ($paragrafoSaida == null)?$paragrafo->nodeValue:$paragrafoSaida;
+                        if($paragrafoSaida == null)
+                        {
+                            $paragrafoSaida = $paragrafo;
+                            $frases = separarEmFrases($paragrafoSaida);
+
+                            $temp = buscarFrasesQueContem($frases, $segundaBusca);
+                            if(count($temp) > 0)
+                            {
+                                $fraseSaida = $temp[0];
+                            }
+                        }
+
 
                         $auxParagrafo = buscarParagrafoQueContem($paragrafos,$segundaBusca);
                         if($auxParagrafo != null)
                         {
-                            $paragrafoSaida = $auxParagrafo->nodeValue;
+                            $paragrafoSaida = $auxParagrafo;
                             $frases = separarEmFrases($paragrafoSaida);
                             $fraseSaida = buscarFrasesQueContem($frases, $segundaBusca)[0];
                             break;
@@ -164,7 +189,9 @@
                 {
                 }
             }
+            var_dump(separarEmFrases($paragrafoSaida)[0]);
             var_dump($fraseSaida);
+            //var_dump($paragrafoSaida);
         }
         catch(Exception $erro)
         {
