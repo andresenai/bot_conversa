@@ -42,6 +42,7 @@
         }
         catch(Exception $e)
         {
+            // echo $e->getMessage();
             throw new Exception("Erro ao baixar a pagina",1);
         }
     }
@@ -80,30 +81,90 @@
         }
     }
 
+    function buscarParagrafoQueContem($paragrafos, $palavra)
+    {
+        foreach($paragrafos as $paragrafo)
+        {
+            if(strpos($paragrafo->nodeValue,$palavra))
+            {
+                return $paragrafo;
+            }
+        }
+        return null;
+    }
+
+    function inverterBusca($vetor, $posicao)
+    {
+        foreach($vetor as $p)
+        {
+            if($p != $posicao)
+            {
+                return $p;
+            }
+        }
+    }
+
+    function separarEmFrases($paragrafo)
+    {
+        return explode(".", $paragrafo);
+    }
+
+    function buscarFrasesQueContem($frases, $busca)
+    {
+        $saida = [];
+        foreach($frases as $frase)
+        {
+            if(strpos($frase,$busca))
+            {
+                array_push($saida, $frase);
+            }
+        }
+
+        return $saida;
+    }
 
     if(isset($_GET['busca']))
     {
         $busca = $_GET['busca'];
-        $url = 'https://pt.wikipedia.org/wiki/'.urlencode($busca);
+        $baseUrl = 'https://pt.wikipedia.org/wiki/';
         
-        var_dump(removerPalavrasInuteis($busca));
 
+        $palavrasUteis = removerPalavrasInuteis($busca);
+        $paragrafoSaida = null;
+        $fraseSaida = null;
         try
         {
+            for($i=0;$i<count($palavrasUteis);$i++)
+            {
+                try
+                {
+                    $segundaBusca = inverterBusca($palavrasUteis, $palavrasUteis[$i]);
 
-            // $pagina = baixarPagina($url);
+                    $url = $baseUrl.urlencode($palavrasUteis[$i]);
+                    $pagina = baixarPagina($url);
+                    $documento = carregarDocumento($pagina);
+                    $paragrafos = carregarParagrafos($documento);
 
-            // $documento = carregarDocumento($pagina);
+                    foreach($paragrafos as $paragrafo)
+                    {
+                        // encontra o primeiro paragrafo da primeira pagina
+                        $paragrafoSaida = ($paragrafoSaida == null)?$paragrafo->nodeValue:$paragrafoSaida;
 
-            // $paragrafos = carregarParagrafos($documento);
+                        $auxParagrafo = buscarParagrafoQueContem($paragrafos,$segundaBusca);
+                        if($auxParagrafo != null)
+                        {
+                            $paragrafoSaida = $auxParagrafo->nodeValue;
+                            $frases = separarEmFrases($paragrafoSaida);
+                            $fraseSaida = buscarFrasesQueContem($frases, $segundaBusca)[0];
+                            break;
+                        }
 
-            // $primeiroParagrafo = capturarPrimeiraFrase($paragrafos[0]->nodeValue);
-
-            // $posicao = rand(1,$paragrafos->length-1);
-            // $paragrafoAleatorio = capturarPrimeiraFrase($paragrafos[$posicao]->nodeValue);
-
-
-            // echo $primeiroParagrafo."<br><br>\n\n".$paragrafoAleatorio;
+                    }
+                }catch(Exception $e)
+                {
+                }
+            }
+            var_dump($fraseSaida);
         }
         catch(Exception $erro)
         {
