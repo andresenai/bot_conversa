@@ -68,14 +68,10 @@
             $paragrafos = explode("<p>",$documento);
             $saida = [];
 
-            $posicao = 0;
-            foreach($paragrafos as $p)
+            for($posicao=1;$posicao < count($paragrafos);$posicao++)
             {
-                if($posicao > 1)
-                {
-                    array_push($saida, strip_tags($p));
-                }
-                $posicao++;
+                $p = $paragrafos[$posicao];
+                array_push($saida, strip_tags($p));
             }
             return $saida;
         } catch (Exception $th) {
@@ -157,40 +153,38 @@
                     $pagina = baixarPagina($url);
                     $documento = carregarDocumento($pagina);
                     $paragrafos = carregarParagrafos($documento);
-
-
-                    foreach($paragrafos as $paragrafo)
+                    
+                    
+                    // encontra o primeiro paragrafo da primeira pagina
+                    if($paragrafoSaida == null)
                     {
-                        // encontra o primeiro paragrafo da primeira pagina
-                        if($paragrafoSaida == null)
+                        $paragrafoSaida = $paragrafos[0];
+                        $frases = separarEmFrases($paragrafoSaida);
+
+                        $temp = buscarFrasesQueContem($frases, $segundaBusca);
+                        if(count($temp) > 0)
                         {
-                            $paragrafoSaida = $paragrafo;
-                            $frases = separarEmFrases($paragrafoSaida);
-
-                            $temp = buscarFrasesQueContem($frases, $segundaBusca);
-                            if(count($temp) > 0)
-                            {
-                                $fraseSaida = $temp[0];
-                            }
+                            $fraseSaida = $temp[0];
                         }
+                    }
 
 
-                        $auxParagrafo = buscarParagrafoQueContem($paragrafos,$segundaBusca);
-                        if($auxParagrafo != null)
-                        {
-                            $paragrafoSaida = $auxParagrafo;
-                            $frases = separarEmFrases($paragrafoSaida);
-                            $fraseSaida = buscarFrasesQueContem($frases, $segundaBusca)[0];
-                            break;
-                        }
-
+                    $auxParagrafo = buscarParagrafoQueContem($paragrafos,$segundaBusca);
+                    if($auxParagrafo != null)
+                    {
+                        $paragrafoSaida = $auxParagrafo;
+                        $frases = separarEmFrases($paragrafoSaida);
+                        $fraseSaida = buscarFrasesQueContem($frases, $segundaBusca)[0];
                     }
                 }catch(Exception $e)
                 {
                 }
             }
-            var_dump(separarEmFrases($paragrafoSaida)[0]);
-            var_dump($fraseSaida);
+
+            $fraseFinal = separarEmFrases($paragrafoSaida)[0];
+
+            echo $fraseFinal;
+            // var_dump($fraseSaida);
             //var_dump($paragrafoSaida);
         }
         catch(Exception $erro)
