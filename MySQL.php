@@ -44,7 +44,7 @@
         public function query($sql, $tipos, $parametros)
         {
             $smtp = $this->conexao->prepare($sql);
-            if($smtp === true)
+            if($smtp !== false)
             {
                 @$smtp->bind_param($tipos, ...$parametros);
                 $status = $smtp->execute();
