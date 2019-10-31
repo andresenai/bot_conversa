@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 30-Out-2019 às 20:42
+-- Generation Time: 31-Out-2019 às 20:44
 -- Versão do servidor: 10.1.30-MariaDB
 -- PHP Version: 7.2.1
 
@@ -40,7 +40,9 @@ CREATE TABLE `perguntas` (
 --
 
 INSERT INTO `perguntas` (`id_perg`, `texto_perg`) VALUES
-(1, 'seu nome');
+(1, 'seu nome'),
+(2, 'você pessoa'),
+(3, 'sua idade');
 
 -- --------------------------------------------------------
 
@@ -136,7 +138,7 @@ ALTER TABLE `respostas`
 -- AUTO_INCREMENT for table `perguntas`
 --
 ALTER TABLE `perguntas`
-  MODIFY `id_perg` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_perg` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `perg_resp`
