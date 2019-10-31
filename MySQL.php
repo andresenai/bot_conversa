@@ -44,27 +44,34 @@
         public function query($sql, $tipos, $parametros)
         {
             $smtp = $this->conexao->prepare($sql);
-            @$smtp->bind_param($tipos, ...$parametros);
-            $status = $smtp->execute();
-            $result = $smtp->get_result();
-
-            $linhasAfetadas = $smtp->affected_rows;
-            $linhas = [];
-            if(!$status)
+            if($smtp === true)
             {
-                throw new Exception("Erro ao executar a query {$sql} erro : {$smtp->error}\n");
+                @$smtp->bind_param($tipos, ...$parametros);
+                $status = $smtp->execute();
+                $result = $smtp->get_result();
+
+                $linhasAfetadas = $smtp->affected_rows;
+                $linhas = [];
+                if(!$status)
+                {
+                    throw new Exception("Erro ao executar a query {$sql} erro : {$smtp->error}\n");
+                }
+                else if($result !== false)
+                {
+                    $linhas = $result->fetch_all(3);
+                }
+                $smtp->close();
+
+                $resposta = new RespostaSQL();
+                $resposta->linhasAfetadas = $linhasAfetadas;
+                $resposta->linhas = $linhas;
+
+                return $resposta;
             }
-            else if($result !== false)
+            else
             {
-                $linhas = $result->fetch_all(3);
+                throw new Exception("Erro ao executar a query {$sql}\n");
             }
-            $smtp->close();
-
-            $resposta = new RespostaSQL();
-            $resposta->linhasAfetadas = $linhasAfetadas;
-            $resposta->linhas = $linhas;
-
-            return $resposta;
         }
     }
 ?>
