@@ -3,33 +3,20 @@
     include "MySQL.php";
 
     $banco = new MySQL("localhost","root","","billy");
-
-    $sql = "select * from perguntas";
-    $doc = new DOMDocument();
-    $select = $doc->createElement("select");
-
-    foreach($banco->query($sql,"",[])->linhas as $linha)
-    {
-        $option = $doc->createElement("option");
-        $option->nodeValue = $linha['texto_perg'];
-        $select->appendChild($option);
-    }
-
-    echo $doc->saveHTML($select);
+    $documento = new DOMDocument();
 
 
-    echo "<br><br><br>";
-
-    // formulario
-    $form = $doc->createElement("form");
+    // formulario novas perguntas
+    $form = $documento->createElement("form");
     $form->setAttribute("method","GET");
     $form->setAttribute("action","cadastrar_pergunta.php");
 
-    $txNovaPergunta = $doc->createElement("input");
+    $txNovaPergunta = $documento->createElement("input");
     $txNovaPergunta->setAttribute("name","novaPergunta");
     $txNovaPergunta->setAttribute("type","text");
+    $txNovaPergunta->setAttribute("placeholder","Texto nova pergunta");
 
-    $btnEnviar = $doc->createElement("input");
+    $btnEnviar = $documento->createElement("input");
     $btnEnviar->setAttribute("name","cadastrar");
     $btnEnviar->setAttribute("type","submit");
 
@@ -37,40 +24,76 @@
     $form->appendChild($btnEnviar);
     
 
-    echo $doc->saveHTML($form);
+    echo $documento->saveHTML($form);
+    //////////////////////////////////////////////////////////
 
 
-    // formulario
-    $form = $doc->createElement("form");
+
+
+
+    // formulario novas respostas
+    $form = $documento->createElement("form");
     $form->setAttribute("method","GET");
     $form->setAttribute("action","cadastrar_resposta.php");
 
     //carrega as perguntas
     $sql = "select id_perg, texto_perg from perguntas";
-    $select = $doc->createElement("select");
+    $select = $documento->createElement("select");
     $select->setAttribute("name","pergunta");
+
+    $option = $documento->createElement("option");
+    $option->nodeValue = "PERGUNTAS";
+    $option->setAttribute("value","");
+    $select->appendChild($option);
+
     foreach($banco->query($sql,"",[])->linhas as $linha)
     {
-        $option = $doc->createElement("option");
+        $option = $documento->createElement("option");
         $option->nodeValue = $linha['texto_perg'];
         $option->setAttribute("value",$linha['id_perg']);
         $select->appendChild($option);
     }
-    /////////////////////
 
-    $txNovaPergunta = $doc->createElement("input");
-    $txNovaPergunta->setAttribute("name","novaResposta");
-    $txNovaPergunta->setAttribute("type","text");
 
-    $btnEnviar = $doc->createElement("input");
+    $txNovaResposta = $documento->createElement("input");
+    $txNovaResposta->setAttribute("name","novaResposta");
+    $txNovaResposta->setAttribute("type","text");
+    $txNovaResposta->setAttribute("placeholder","Texto nova resposta");
+
+
+    $btnEnviar = $documento->createElement("input");
     $btnEnviar->setAttribute("name","cadastrar");
     $btnEnviar->setAttribute("type","submit");
 
     $form->appendChild($select);
-    $form->appendChild($txNovaPergunta);
+    $form->appendChild($txNovaResposta);
     $form->appendChild($btnEnviar);
     
 
-    echo $doc->saveHTML($form);
+    echo $documento->saveHTML($form);
+    ///////////////////////////////////////////////////////////////
 
+
+
+
+    // todas as respostas
+    $sql = "select id_resp, texto_resp from respostas";
+    $select = $documento->createElement("select");
+    $select->setAttribute("name","respostas");
+
+    $option = $documento->createElement("option");
+    $option->nodeValue = "RESPOSTAS";
+    $option->setAttribute("value","");
+    $select->appendChild($option);
+
+    foreach($banco->query($sql,"",[])->linhas as $linha)
+    {
+        $option = $documento->createElement("option");
+        $option->nodeValue = $linha['texto_resp'];
+        $option->setAttribute("value",$linha['id_resp']);
+        $select->appendChild($option);
+    }
+
+    echo $documento->saveHTML($select);
+    ///////////////////////////////////////////////////////////////////
 ?>

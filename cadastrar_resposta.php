@@ -17,15 +17,9 @@
             
             if($saida->linhasAfetadas > 0)
             {
-                
-                // busca o id da pergunta que você acabou de cadastrar
-                $sql = "select id_resp from respostas where texto_resp = ?";
-                $saida = $banco->query($sql,"s",[$resposta]);
-                $idResposta = $saida->linhas[0][0];
-
                 // insere a relação no banco de dados
-                $sql = "insert into perg_resp (fk_perg, fk_resp) values (?,?)";
-                $saida = $banco->query($sql,"ii",[$idPergunta, $idResposta]);
+                $sql = "insert into perg_resp (fk_resp, fk_perg) values ( (select id_resp from respostas where texto_resp = ? limit 1) ,?)";
+                $saida = $banco->query($sql,"si",[$resposta, $idPergunta]);
                 if($saida->linhas > 0)
                 {
                     echo "SUCESSO AO CADASTRAR RESPOSTA";
